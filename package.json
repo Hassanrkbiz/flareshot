@@ -1,0 +1,17 @@
+{
+  "name": "flareshot",
+  "version": "1.0.1",
+  "description": "Take screenshots of URLs using Cloudflare Workers Browser Rendering (Puppeteer API).",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": ["cloudflare", "screenshot", "browser", "worker", "rendering", "puppeteer", "flareshot"],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hassanrkbiz/flareshot.git"
+  }
+}
