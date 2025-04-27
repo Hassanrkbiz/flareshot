@@ -14,18 +14,16 @@ npm install flareshot
 ## Usage (in a Worker)
 
 ```js
-import { takeScreenshot } from 'flareshot';
+import { Flareshot } from 'flareshot';
 
+// In your Cloudflare Worker handler:
 export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url).searchParams.get('url');
-    if (!url) return new Response('Missing url param', { status: 400 });
-    const image = await takeScreenshot(url, { fullPage: true });
-    return new Response(image, {
-      headers: { 'Content-Type': 'image/png' }
-    });
+  async fetch(request, env) {
+    const client = new Flareshot(env.BROWSER);
+    const image = await client.takeScreenshot('https://example.com', { fullPage: true });
+    return new Response(image, { headers: { 'Content-Type': 'image/png' } });
   }
-};
+}
 ```
 
 ## Usage (local test, Node.js)
@@ -48,6 +46,7 @@ const fs = require('fs');
 
 ## Options
 - `url`: URL to screenshot
+- `binding`: The browser binding from Cloudflare Worker environment (e.g., `env.BROWSER`)
 - `options`: (optional) Additional options for Puppeteer screenshot (see Puppeteer docs)
 
 ## License
