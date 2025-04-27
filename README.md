@@ -38,11 +38,9 @@ const fs = require('fs');
 
 (async () => {
   const buffer = await takeScreenshot('https://example.com', {
-    renderOptions: {
-      // width: 1280,
-      // height: 800,
-      // full_page: true
-    }
+    fullPage: true,
+    type: 'jpeg',
+    // any Puppeteer screenshot options
   });
   fs.writeFileSync('screenshot.png', buffer);
 })();
@@ -50,7 +48,7 @@ const fs = require('fs');
 
 ## Options
 - `url`: URL to screenshot
-- `renderOptions`: (optional) Additional options for rendering (see Cloudflare docs)
+- `options`: (optional) Additional options for Puppeteer screenshot (see Puppeteer docs)
 
 ## License
 MIT
