@@ -27,8 +27,31 @@ export class Flareshot {
     try {
       browser = await puppeteer.launch(this.binding);
       const page = await browser.newPage();
+
+      // Optionally set viewport if width or height provided
+      if (options.width || options.height) {
+        await page.setViewport({
+          width: options.width || 800, // fallback default if only height is provided
+          height: options.height || 600, // fallback default if only width is provided
+        });
+      }
+
       await page.goto(url, { waitUntil: 'networkidle2' });
-      const screenshot = await page.screenshot(options);
+
+      // Prepare screenshot options
+      const screenshotOptions = { ...options };
+      // Remove width/height from screenshotOptions, as they are not valid for page.screenshot
+      delete screenshotOptions.width;
+      delete screenshotOptions.height;
+
+      // Handle quality: only valid for jpeg
+      if (screenshotOptions.quality !== undefined) {
+        screenshotOptions.type = 'jpeg';
+        // Clamp quality between 0 and 100
+        screenshotOptions.quality = Math.max(0, Math.min(100, Number(screenshotOptions.quality)));
+      }
+
+      const screenshot = await page.screenshot(screenshotOptions);
       return screenshot;
     } catch (err) {
       console.error('Screenshot failed:', err);

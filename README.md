@@ -20,34 +20,25 @@ import { Flareshot } from 'flareshot';
 export default {
   async fetch(request, env) {
     const client = new Flareshot(env.BROWSER);
-    const image = await client.takeScreenshot('https://example.com', { fullPage: true });
+    const image = await client.takeScreenshot('https://example.com', {
+      fullPage: true,
+      width: 1200, // optional
+      height: 800, // optional
+      type: 'jpeg', // optional, default is PNG
+      quality: 90, // optional, JPEG only, 0-100
+    });
     return new Response(image, { headers: { 'Content-Type': 'image/png' } });
   }
 }
-```
-
-## Usage (local test, Node.js)
-
-> This package is intended for Cloudflare Workers, but you can test the API locally (see `test.js`).
-
-```js
-const { takeScreenshot } = require('flareshot');
-const fs = require('fs');
-
-(async () => {
-  const buffer = await takeScreenshot('https://example.com', {
-    fullPage: true,
-    type: 'jpeg',
-    // any Puppeteer screenshot options
-  });
-  fs.writeFileSync('screenshot.png', buffer);
-})();
 ```
 
 ## Options
 - `url`: URL to screenshot
 - `binding`: The browser binding from Cloudflare Worker environment (e.g., `env.BROWSER`)
 - `options`: (optional) Additional options for Puppeteer screenshot (see Puppeteer docs)
+  - `width` (optional): Set viewport width
+  - `height` (optional): Set viewport height
+  - `quality` (optional, JPEG only): JPEG quality (0-100, clamped)
 
 ## License
 MIT
