@@ -28,8 +28,29 @@ export class Flareshot {
       browser = await puppeteer.launch(this.binding);
       const page = await browser.newPage();
 
-      // Optionally set viewport if width or height provided
-      if (options.width || options.height) {
+      // Device emulation presets
+      const devices = {
+        mobile: {
+          viewport: { width: 375, height: 812, isMobile: true, deviceScaleFactor: 2 },
+          userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1',
+        },
+        tablet: {
+          viewport: { width: 768, height: 1024, isMobile: true, deviceScaleFactor: 2 },
+          userAgent: 'Mozilla/5.0 (iPad; CPU OS 13_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1',
+        },
+        desktop: {
+          viewport: { width: 1366, height: 768, isMobile: false, deviceScaleFactor: 1 },
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        },
+      };
+
+      // Set device emulation if requested
+      if (options.device && devices[options.device]) {
+        const device = devices[options.device];
+        await page.setViewport(device.viewport);
+        await page.setUserAgent(device.userAgent);
+      } else if (options.width || options.height) {
+        // Optionally set viewport if width or height provided
         await page.setViewport({
           width: options.width || 800, // fallback default if only height is provided
           height: options.height || 600, // fallback default if only width is provided
@@ -38,11 +59,19 @@ export class Flareshot {
 
       await page.goto(url, { waitUntil: 'networkidle2' });
 
+      // Add delay support (max 10s)
+      const delay = Math.min(Number(options.delay) || 0, 10);
+      if (delay > 0) {
+        await page.waitForTimeout(delay * 1000);
+      }
+
       // Prepare screenshot options
       const screenshotOptions = { ...options };
-      // Remove width/height from screenshotOptions, as they are not valid for page.screenshot
+      // Remove width/height/device/delay from screenshotOptions, as they are not valid for page.screenshot
       delete screenshotOptions.width;
       delete screenshotOptions.height;
+      delete screenshotOptions.device;
+      delete screenshotOptions.delay;
 
       // Handle quality: only valid for jpeg
       if (screenshotOptions.quality !== undefined) {
