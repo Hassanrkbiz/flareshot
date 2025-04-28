@@ -62,7 +62,8 @@ export class Flareshot {
       // Add delay support (max 10s)
       const delay = Math.min(Number(options.delay) || 0, 10);
       if (delay > 0) {
-        await page.waitForTimeout(delay * 1000);
+        // Use standard JS sleep instead of page.waitForTimeout for Cloudflare compatibility
+        await new Promise(res => setTimeout(res, delay * 1000));
       }
 
       // Prepare screenshot options
